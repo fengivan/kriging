@@ -1,0 +1,157 @@
+<html>
+    <head>
+        <meta charset = "utf-8">
+        <title> Kriger</title>
+        <style>
+            body{
+                    height:3000px;
+                    background-color: white;
+                    position:relative;
+
+            }
+            .dot{
+                width: 4px;
+                height: 4px;
+                background-color:red;
+                position:absolute;
+            }
+
+            .grid{
+                width:800px;
+                height:800px;
+                left:300px;
+                background-color:white;
+                position:absolute;
+                border-style:solid;
+            }
+            .input{
+                width:300px;
+                left:1200px;
+                background-color:white;
+                height:25px;
+                border-style:solid;
+            }
+            .mousepos{
+                width:300px;
+                left:1125px;
+                background-color:white;
+                
+                border-style:solid;
+            }
+            
+            th, tr, td{
+                border: 1px solid black;
+                padding: 5px;
+            }
+            
+
+
+        </style>
+    </head>
+
+
+    <body>
+
+        <div class= "grid">
+
+        </div>
+        <table class = "mousepos">
+            <tr>
+                <th> X   </th>
+                <th> Y   </th>
+            </tr>
+            <tr >
+                <th> 0   </th>
+                <th> 0   </th>
+            </tr>
+        </table>
+        <table class="input">
+            <tr class= "top">
+                <th> X   </th>
+                <th> Y   </th>
+                <th> Value   </th>
+            </tr>
+        </table>
+
+
+        
+
+
+    </body>
+
+        <script>
+            let maxpoints = 15;
+            let points=0;
+            let grid = document.querySelector(".grid");
+            let table=document.querySelector(".input");
+            let mouseguide=document.querySelector(".mousepos");
+
+            let data=[];
+            
+            grid.addEventListener("click", recordpoint);
+            grid.addEventListener("mousemove",updatepos);
+            console.log("running");
+            document.addEventListener("keydown", getdata);
+
+            function updatepos(e)
+            {
+                var rect = e.target.getBoundingClientRect();
+                var x = e.clientX - rect.left; //x position within the element.
+                var y = e.clientY - rect.top;  //y position within the element.
+                mouseguide.rows[1].cells[0].innerHTML=x;
+                mouseguide.rows[1].cells[1].innerHTML=800-y;
+
+
+            }
+
+            function getdata(e)
+            {
+                if(e.keyCode==17)
+                    for(var i=1; i<points+1; i++)
+                        data.push([table.rows[i].cells[0].innerHTML,table.rows[i].cells[1].innerHTML,table.rows[1].cells[2].children[0].value]);
+            }
+
+            function recordpoint(e)
+            {
+                if(maxpoints<=0) return; else maxpoints--;
+                points++;
+                var rect = e.target.getBoundingClientRect();
+                var x = e.clientX - rect.left; //x position within the element.
+                var y = e.clientY - rect.top;  //y position within the element.
+                
+
+                var dot=document.createElement("div");
+                dot.className="dot";
+                dot.style.left=x-5+"px";
+                dot.style.top=y-5+"px";
+                grid.appendChild(dot);
+
+                var newrow=document.createElement("tr");
+                var newx=document.createElement("th");
+                newx.innerHTML=x;
+                var newy=document.createElement("th");
+                newy.innerHTML=800-y
+                var newval=document.createElement("th");
+                newval.appendChild(document.createElement("input"));
+
+                newrow.appendChild(newx);
+                newrow.appendChild(newy);
+                newrow.appendChild(newval);
+                table.appendChild(newrow);
+                
+                
+
+            }
+        </script>
+
+
+
+
+
+
+
+    
+
+
+
+</html>
