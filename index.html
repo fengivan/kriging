@@ -1,283 +1,50 @@
 <html>
     <head>
         <meta charset = "utf-8">
-        <title> Kriger</title>
+        <title> Kriging Tool</title>
         <script src=https://cdnjs.cloudflare.com/ajax/libs/mathjs/8.1.1/math.js></script>
-        <style>
-            body{
-                    height:3000px;
-                    background-color: white;
-                    position:relative;
-
-            }
-            .dot{
-                width: 4px;
-                height: 4px;
-                background-color:red;
-                position:absolute;
-            }
-
-            .grid{
-                width:800px;
-                height:800px;
-                left:300px;
-                background-color:white;
-                position:absolute;
-                border-style:solid;
-            }
-            .input{
-                width:295px;
-                left:1200px;
-                background-color:white;
-                height:25px;
-                border-style:solid;
-            }
-            .mousepos{
-                width:295px;
-                left:1125px;
-                background-color:white;
-                
-                border-style:solid;
-            }
-            
-            th, tr, td{
-                border: 1px solid black;
-                padding: 5px;
-            }
-            button{
-                font-size: 2em;
-                margin-top:10px;
-                margin-bottom:10px;
-                width:145px;
-            }
-            .box{
-                width: 80px;
-                height: 80px;
-                background-color:blue;
-                position:absolute;
-                
-            }
-            
-
-
-        </style>
+        <link rel = "stylesheet" href="style.css">
     </head>
 
-
     <body>
+        <div class= "grid"></div>
+        <table class = "model">
+            <tr>
+                <th colspan="2" >Expenential Model Parameters</th>
+            </tr>
+            <tr> 
+                <th>C</th>
+                <th>A</th>
+            </tr>
+            <tr> 
+                <th><input class = "c" value="1800"></th>
+                <th><input class = "a" value = "300"></th>
+            </tr>
+        </table>
 
-        <div class= "grid">
-
-        </div>
         <table class = "mousepos">
             <tr>
-                <th> X   </th>
-                <th> Y   </th>
-                <th> Value </th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Value</th>
             </tr>
             <tr >
-                <th> 0   </th>
-                <th> 0   </th>
-                <th> 0   </th>
+                <th>0</th>
+                <th>0</th>
+                <th>0</th>
             </tr>
         </table>
+
         <button class = "clear" type="button">Clear</button>
         <button class = "krig" type="button">Krig</button>
+
         <table class="input">
             <tr class= "top">
-                <th> X   </th>
-                <th> Y   </th>
-                <th> Value   </th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Value</th>
             </tr>
         </table>
-
-
-        
-
-
     </body>
-
-        <script>
-            let maxpoints = 15;
-            let points=0;
-            let input=[];
-            let cc=1800;
-            let ca=300;
-            let table=document.querySelector(".input");
-            let mouseguide=document.querySelector(".mousepos");
-            let grid = document.querySelector(".grid");
-            grid.addEventListener("click", recordpoint);
-            grid.addEventListener("mousemove",updatepos);
-            let krigged=false;
-
-            console.log("running");
-            
-            implementbuttons();
-
-            function getrange(data)
-            {
-                let min=Infinity;
-                let max=-Infinity;
-
-                for(let i =0; i<data.length; i++)
-                {
-                    if(parseInt(data[i][2])<min)
-                        min=data[i][2];
-                    if(parseInt(data[i][2])>max)
-                        max=data[i][2];
-                }
-                let temp=[min, max];
-                return temp;
-            }
-
-            function fillgrid()
-            {
-                let gridboxes=40;
-                let smallest=getrange(input)[0];
-                let biggest=getrange(input)[1];
-                cleargrid();
-                var rect=grid.getBoundingClientRect();
-                for(var i =0; i<gridboxes; i++)
-                {
-                    for(var j=0; j<gridboxes; j++)
-                    {   
-                        var x = i*800/gridboxes; //x position within the element.
-                        var y = j*800/gridboxes;  //y position within the element.
-                        let boxcolor=(1-(krig(x+400/gridboxes, 800-y+400/gridboxes, input, cc, ca)-smallest)/(biggest-smallest))*255;
-                        var sq=document.createElement("div");
-                        sq.className="box";
-                        sq.style.left=x-2+"px";
-                        sq.style.top=y-2+"px";
-                        sq.style.backgroundColor="rgb(255,"+boxcolor+","+boxcolor+")";
-                        grid.appendChild(sq);
-
-                    }
-                }
-            }
-
-            function implementbuttons()
-            {
-                
-                document.querySelector(".clear").addEventListener("click", clear);
-                document.querySelector(".krig").addEventListener("click", run);
-
-
-            }
-
-            function krig(x, y, data, covariancec, covariancea)//returns the kriged value at x,y, given a set of x-y points and the values at those x-y points
-            {
-                let matrix=[];
-                let lastrow=[];
-                let vals=[];
-                for(let i =0; i<data.length; i++)
-                {
-                    let temp=[];
-                    for(let j=0; j<data.length; j++)
-                    {
-                        temp.push(covariancec*Math.exp(-Math.pow(Math.pow(data[i][0]-data[j][0], 2)+Math.pow(data[i][1]-data[j][1],2),.5)/covariancea));
-                    }
-                    vals.push(covariancec*Math.exp(-Math.pow(Math.pow(data[i][0]-x, 2)+Math.pow(data[i][1]-y,2), .5)/covariancea));
-                    temp.push(1);
-                    lastrow.push(1);
-                    matrix.push(temp);
-                }
-                lastrow.push(0);
-                vals.push(1);
-                matrix.push(lastrow);
-                let results=math.multiply(math.inv(matrix), vals);
-                let output=0;
-                for(let i =0; i<results.length-1; i++)
-                    output+=results[i]*data[i][2];
-                
-                return output;
-            }
-
-
-            function clear()
-            {
-                krigged=false;
-                console.log("runnfing");
-                points=0;
-                let input=[];
-                cleargrid();
-                mouseguide.rows[1].cells[2].innerHTML=0;
-                while(table.childNodes.length>2)
-                {
-                    table.removeChild(table.lastChild);
-                }
-            }
-            function cleargrid()
-            {
-                while(grid.childNodes.length>1)
-                {
-                    grid.removeChild(grid.lastChild);
-                }
-            }
-
-            function updatepos(e)
-            {
-                var rect = grid.getBoundingClientRect();
-                var x = e.clientX - rect.left; //x position within the element.
-                var y = e.clientY - rect.top;  //y position within the element.
-                mouseguide.rows[1].cells[0].innerHTML=x;
-                mouseguide.rows[1].cells[1].innerHTML=800-y;
-                if(krigged)
-                    mouseguide.rows[1].cells[2].innerHTML=krig(x, 800-y, input, cc, ca);
-
-            }
-
-            function run()
-            {
-               
-                        for(var i=1; i<points+1; i++)
-                            input.push([table.rows[i].cells[0].innerHTML,table.rows[i].cells[1].innerHTML,table.rows[i].cells[2].children[0].value]);
-                        fillgrid();
-                    
-                krigged=true;
-                
-            }
-
-            function recordpoint(e)
-            {
-                if(points>=maxpoints) return;
-                points++;
-                var rect = e.target.getBoundingClientRect();
-                var x = e.clientX - rect.left; //x position within the element.
-                var y = e.clientY - rect.top;  //y position within the element.
-                
-
-                var dot=document.createElement("div");
-                dot.className="dot";
-                dot.style.left=x-5+"px";
-                dot.style.top=y-5+"px";
-                grid.appendChild(dot);
-
-                var newrow=document.createElement("tr");
-                var newx=document.createElement("th");
-                newx.innerHTML=x;
-                var newy=document.createElement("th");
-                newy.innerHTML=800-y
-                var newval=document.createElement("th");
-                newval.appendChild(document.createElement("input"));
-
-                newrow.appendChild(newx);
-                newrow.appendChild(newy);
-                newrow.appendChild(newval);
-                table.appendChild(newrow);
-                
-                
-
-            }
-        </script>
-
-
-
-
-
-
-
-    
-
-
-
+        <script src = "script.js"> </script>
 </html>

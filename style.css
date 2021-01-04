@@ -1,0 +1,57 @@
+body{
+        height:3000px;
+        background-color: white;
+        position:relative;
+}
+.dot{
+    width: 4px;
+    height: 4px;
+    background-color:red;
+    position:absolute;
+}
+
+.grid{
+    width:800px;
+    height:800px;
+    left:300px;
+    background-color:white;
+    position:absolute;
+    border-style:solid;
+}
+.input{
+    width:295px;
+    left:1200px;
+    background-color:white;
+    height:25px;
+    border-style:solid;
+}
+.mousepos{
+    width:297px;
+    left:1125px;
+    border-style:solid;
+}
+
+th, tr, td{
+    border: 1px solid black;
+    padding: 5px;
+}
+button{
+    font-size: 2em;
+    margin-top:10px;
+    margin-bottom:10px;
+    width:145px;
+}
+.box{
+    width: 20px;
+    height: 20px;
+    background-color:blue;
+    position:absolute;
+}
+.model
+{
+    border-style:solid;
+    margin-bottom:10px;
+}
+input{
+    width:100px;
+}
