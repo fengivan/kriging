@@ -1,5 +1,4 @@
-let maxpoints = 10;                                         //maximum # of points is limited for performance reasons
-let points=0;                                               //points so far
+let points=0;
 let input=[];                                               //input contains the x-y pos and the values at the given x-y positions
 let cc=1800;                                                //exponential covariance parameter
 let ca=300;                                                 //exponential covariance parameter
@@ -125,8 +124,6 @@ function run()                                              //collects all the d
 
 function recordpoint(e)                                     //records mouse clicks on the grid and marks the points in the table.
 {
-    if(points>=maxpoints) 
-        return;
     points++;
     var rect = e.target.getBoundingClientRect();
     var x = e.clientX - rect.left; 
