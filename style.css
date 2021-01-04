@@ -18,6 +18,17 @@ body{
     position:absolute;
     border-style:solid;
 }
+
+.minev{
+    width:800px;
+    height:800px;
+    left:1110px;
+    background-color:white;
+    position:absolute;
+    border-style:solid;
+    
+
+}
 .input{
     width:295px;
     left:1200px;
